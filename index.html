@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Diary</title>
+        <script type="module">
+
+            // https://forartssake485557105.files.wordpress.com/2021/04/out-of-focus-flowers-15-03-2021-img_0320-1.jpg?w=1024
+            import zim from "https://zimjs.org/cdn/016/zim";
+            
+
+            new Frame(FIT, 500, 1000, dark, darker, ready,["Group 1.png"], "assets/");
+            function ready() {
+                // Given F, S, W, H or frame, stage, stageW, stageH
+
+
+
+let  backing = new Pic("Group 1.png").scaleTo().center()
+
+let container = new Container(1000,2000).scaleTo(S, 100,100).center();
+
+let diaryList 
+
+
+const circle = new Circle(15, grey).loc(380, 890).alp(0.7);
+  circle.animate({
+    props:{scale: 2},
+    time: 0.5,
+    loop: true,
+    rewind: true
+  });
+
+
+circle.tap(()=>{
+    part2()
+    circle.removeFrom()
+})
+
+
+function part2(){
+    const rectangle = new Rectangle({width: 1140, height: 2300, color: blue, corner:100}).addTo(backing).pos(57,50).alp(0).animate({
+        props:{alpha: 1},
+        time:0.5
+    })
+
+    const title = new Label({
+    text:"Personal \n   Diary",
+    size:150,
+    bold:true,
+    color: red
+    }).center(rectangle).alp(0).animate({
+        props:{alpha: 1},
+        time:1.5,
+        call: button
+    })
+
+    function button(){
+        const db = new Label({
+            text:"Begin",
+            size:20,
+            bold:true
+        });
+
+        const start = new Button({
+            label:db,
+            width:170,
+            height:50,
+            backgroundColor:"red",
+            rollBackgroundColor:"blue",
+            borderWidth:4,
+            borderColor:"white",
+            gradient:.3,
+            corner:10,
+        }).pos(160, 800)
+
+        start.on("click", ()=>{
+            rectangle.removeFrom(),
+            start.removeFrom()
+            part3()
+        })
+
+    }
+}
+
+function part3(){
+
+const bind = new Bind("diaryManagerData8", LOCALSTORAGE, null, (data, command, extra, process) => {
+
+if (command == "from") { 
+    zog(data);
+    diaryList.clear()
+    if (data.diarys) diaryList.addAt(data.diarys.itemsText)
+
+    process.stop()
+}
+
+return data
+
+});
+
+const rectangle2 = new Rectangle({width: 1140, height: 2300, color: lighter, corner:100}).addTo(backing).pos(57,50)
+
+
+const notes = new Label({
+    text:"Write your notes",
+    size:20,
+    bold:true
+}).pos(50, 80, rectangle2);
+
+const diaryInput = new TextArea({
+    width: 400,
+    height: 700,
+    color: darker,
+    backgroundColor: lighter,
+    placeholder: "Add Date and Title of your choice",
+    size: 18,
+    corner: 10,
+    borderColor: darker
+}).center().pos(50, 110, rectangle2)
+
+const label = new Label({
+    text:"Add Diary",
+    size:20,
+    bold:true
+});
+
+const addButton = new Button({
+    label:label,
+    width:150,
+    height:50,
+    backgroundColor:"yellow",
+    rollBackgroundColor:"lightgreen",
+    borderWidth:4,
+    borderColor:"lightblue",
+    gradient:.3,
+    corner:10,
+}).pos(300,850, rectangle2);
+
+
+
+const diaryList = new List({
+    width: 400,
+    height: 700,
+    corner: 10,
+    viewNum: 15,
+    titleBar: "Diary List",
+    
+}).pos(100, 50).alp(0);
+
+bind.add("diarys", diaryList, "itemsText");
+
+
+addButton.on("click", () => {
+    const diaryName = diaryInput.text;
+    if (diaryName.trim() !== "") {
+        diaryList.addAt(diaryName);
+        diaryInput.text = "";
+        bind.to();
+    } else {
+        alert("diary name cannot be empty!");
+    }
+});
+
+
+diaryList.on("change", () => {
+    bind.to();
+});
+
+// I tried to implement a diaryclick function it didnt work
+diaryList.on("click", () => {
+    const selectedEntry = diaryList.selectedItem;  // Get the selected item from the list
+    if (selectedEntry) {
+        const content = selectedEntry.text;  // This assumes you store the full text as the item text in the list
+
+        // Create a popup to display the full diary entry
+        const popup = new Popup({
+            width: 300,
+            height: 300,
+            title: "Diary Entry",
+            content: content,
+            color: "black",
+            backgroundColor: "white",
+            close: true  // Adds a close button to the popup
+        });
+        popup.center();  // Center the popup on the stage
+    } else {
+        alert("No diary entry selected!");
+    }
+});
+
+
+const label2 = new Label({
+    text:"Go to List",
+    size:20,
+    bold:true
+});
+
+const listButton = new Button({
+    label:label2,
+    width:150,
+    height:50,
+    backgroundColor:"yellow",
+    rollBackgroundColor:"lightgreen",
+    borderWidth:4,
+    borderColor:"lightblue",
+    gradient:.3,
+    corner:10,
+}).pos(50,850, rectangle2);
+
+listButton.on("click", () => {
+    notes.removeFrom()
+    diaryInput.removeFrom()
+    addButton.removeFrom()
+    listButton.removeFrom()
+    diaryList.animate({
+        props:{alpha: 1},
+        time:0.5
+    }).center()
+
+    const backLabel = new Label({
+    text:"Go Back",
+    size:20,
+    bold:true
+    });
+
+    const backButton = new Button({
+    label:backLabel,
+    width:150,
+    height:50,
+    backgroundColor:"yellow",
+    rollBackgroundColor:"lightgreen",
+    borderWidth:4,
+    borderColor:"lightblue",
+    gradient:.3,
+    corner:10,
+    }).pos(50,50, rectangle2);
+
+
+    backButton.on("click", ()=>{
+        notes.addTo()
+        diaryInput.addTo()
+        addButton.addTo()
+        listButton.addTo()
+        backButton.removeFrom()
+        deleteButton.removeFrom()
+        diaryList.alp(0)
+    })
+
+
+
+
+    const deleteLabel = new Label({
+    text:"Delete Note",
+    size:20,
+    bold:true
+    });
+
+    const deleteButton = new Button({
+        label:deleteLabel,
+        width:150,
+        height:50,
+        backgroundColor:"yellow",
+        rollBackgroundColor:"lightgreen",
+        borderWidth:4,
+        borderColor:"lightblue",
+        gradient:.3,
+        corner:10,
+    }).pos(300,50, rectangle2);
+
+
+    deleteButton.on("click", () => {
+
+    const selectedIndex = diaryList.selectedIndex;
+
+    if (selectedIndex !== -1) {
+        diaryList.removeAt(1, selectedIndex);
+        bind.to();
+    } else {
+        alert("Please select a diary to delete!");
+    }
+    });
+
+
+    bind.from(() => {
+        diaryList.items = bind.data.diarys || [];
+    });
+
+
+
+});
+
+
+
+    F.on("resize", ()=>{
+        backing.scaleTo().center();
+        container.scaleTo(S, 100,100).center();
+    })
+
+
+}
+
+            } // end ready
+        </script>
+        <meta name="viewport" content="width=device-width, user-scalable=no" />
+    </head>
+    <body></body>
+</html>
